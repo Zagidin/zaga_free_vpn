@@ -1,560 +1,342 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔥 ZAGA FREE VPN 🔥</title>
-    <script src="https://tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700;800&family=Share+Tech+Mono&display=swap');
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050a05">
+<title>ZAGA VPN — Free Proxy Service</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700;800&display=swap');
 
-        :root {
-            --neon: #00ff41;
-            --neon-dim: #00cc33;
-            --neon-glow: rgba(0, 255, 65, 0.4);
-            --dark: #0a0a0a;
-            --dark-card: rgba(10, 20, 10, 0.85);
-        }
+:root{
+  color-scheme:dark;
+  --neon:#00ff41;
+  --neon-glow:rgba(0,255,65,.4);
+  --line:rgba(0,255,65,.14);
+  --panel:rgba(8,16,10,.82);
+  --text:#cfe9d6;
+  --muted:#8fa896;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'JetBrains Mono',monospace;
+  background:#050a05;color:var(--text);
+  min-height:100vh;overflow-x:hidden;
+}
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+/* ===== фон: матрица + сканлайны + сетка ===== */
+#matrix-bg{position:fixed;inset:0;z-index:0;opacity:.12}
+body::before{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,65,.012) 2px,rgba(0,255,65,.012) 4px)}
+body::after{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;
+  background-image:linear-gradient(rgba(0,255,65,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,65,.02) 1px,transparent 1px);
+  background-size:50px 50px}
+.particle{position:fixed;width:2px;height:2px;background:var(--neon);border-radius:50%;pointer-events:none;z-index:2;opacity:0;animation:float-up 8s linear infinite}
+@keyframes float-up{0%{opacity:0;transform:translateY(100vh) scale(0)}10%{opacity:.5}90%{opacity:.15}100%{opacity:0;transform:translateY(-10vh) scale(1)}}
 
-        body {
-            font-family: 'JetBrains Mono', monospace;
-            background: #050a05;
-            color: #c0ffc0;
-            min-height: 100vh;
-            overflow-x: hidden;
-            position: relative;
-        }
+/* ===== каркас ===== */
+.wrap{position:relative;z-index:10;width:min(100% - 36px,960px);margin:auto;display:flex;flex-direction:column;min-height:100vh}
 
-        #matrix-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            opacity: 0.12;
-        }
+/* ===== терминальная шапка ===== */
+.top{display:flex;justify-content:space-between;align-items:center;padding:22px 0}
+.dots{display:flex;gap:6px}
+.dot{width:9px;height:9px;border-radius:50%}
+.dot-r{background:#ff5f57}.dot-y{background:#ffbd2e}.dot-g{background:#28ca41}
+.online{display:flex;align-items:center;gap:8px;font-size:10px;letter-spacing:.15em;color:rgba(0,255,65,.55)}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--neon);box-shadow:0 0 7px var(--neon);animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4;transform:scale(.7)}}
 
-        .scanlines::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 2px,
-                rgba(0, 255, 65, 0.012) 2px,
-                rgba(0, 255, 65, 0.012) 4px
-            );
-            pointer-events: none;
-            z-index: 1;
-        }
+/* ===== hero ===== */
+.hero{text-align:center;padding:48px 0 52px}
+.ascii{
+  width:max-content;margin:0 auto 26px;
+  font-size:clamp(5px,2.2vw,16px);line-height:1.12;
+  color:var(--neon);
+  text-shadow:0 0 6px var(--neon-glow),0 0 22px var(--neon-glow);
+  user-select:none;cursor:pointer;
+}
+.hero .sub{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:rgba(0,255,65,.45);margin-bottom:12px}
+.hero .hint{font-size:11px;color:rgba(0,255,65,.3)}
+.cursor-blink::after{content:"█";color:var(--neon);animation:blink 1s step-end infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.actions{display:flex;justify-content:center;gap:11px;flex-wrap:wrap;margin-top:30px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 20px;border-radius:11px;
+  border:1px solid rgba(0,255,65,.6);background:var(--neon);color:#06120a;
+  font-family:inherit;font-weight:700;font-size:12px;letter-spacing:.04em;text-decoration:none;cursor:pointer;transition:.2s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 0 22px var(--neon-glow)}
+.btn.ghost{background:rgba(0,255,65,.06);color:var(--text);border-color:var(--line)}
+.btn.ghost:hover{border-color:rgba(0,255,65,.45);box-shadow:0 0 16px rgba(0,255,65,.12)}
 
-        .grid-overlay::after {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                linear-gradient(rgba(0,255,65,0.02) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0,255,65,0.02) 1px, transparent 1px);
-            background-size: 50px 50px;
-            pointer-events: none;
-            z-index: 1;
-        }
+/* ===== секции ===== */
+section{margin:14px 0 54px}
+.heading{display:flex;justify-content:space-between;align-items:flex-end;gap:15px;margin-bottom:18px}
+.kicker{color:var(--neon);font-size:10px;font-weight:800;letter-spacing:.22em}
+.heading h2{margin:6px 0 0;font-size:clamp(20px,4vw,27px);letter-spacing:-.02em;color:#eafff0;text-shadow:0 0 14px rgba(0,255,65,.18)}
+.hint-r{color:var(--muted);font-size:11px}
 
-        .content-wrapper {
-            position: relative;
-            z-index: 10;
-        }
+/* карточки */
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.card{position:relative;overflow:hidden;padding:24px;border:1px solid var(--line);border-radius:18px;
+  background:var(--panel);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:.25s}
+.card:hover{transform:translateY(-3px);border-color:rgba(0,255,65,.4);box-shadow:0 0 30px rgba(0,255,65,.07)}
+.card::after{content:"";position:absolute;right:-60px;top:-80px;width:170px;height:170px;border-radius:50%;background:rgba(0,255,65,.07);filter:blur(26px);pointer-events:none}
+.cardtop{display:flex;justify-content:space-between;align-items:center}
+.ico{display:grid;place-items:center;width:46px;height:46px;border:1px solid var(--line);border-radius:13px;background:rgba(0,255,65,.05);font-size:21px}
+.tag{padding:5px 9px;border:1px solid rgba(0,255,65,.3);border-radius:7px;color:var(--neon);background:rgba(0,255,65,.08);font-size:9px;font-weight:800;letter-spacing:.14em}
+.card h3{margin:17px 0 6px;font-size:18px;color:#fff}
+.card p{color:var(--muted);font-size:12px;line-height:1.6}
+.cardfoot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:22px}
+.meta{color:#7d9684;font-size:10px}
+.copy{min-height:40px;padding:0 15px;border:1px solid rgba(0,255,65,.55);border-radius:10px;background:rgba(0,255,65,.07);
+  color:var(--neon);font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.2s}
+.copy:hover,.copy.done{background:var(--neon);color:#06120a;box-shadow:0 0 16px var(--neon-glow)}
 
-        .glow-text {
-            color: var(--neon);
-            text-shadow: 
-                0 0 7px var(--neon-glow),
-                0 0 20px var(--neon-glow),
-                0 0 42px var(--neon-glow);
-        }
+/* warning */
+.warning{display:grid;grid-template-columns:auto 1fr;gap:15px;padding:21px 22px;border:1px solid rgba(255,70,70,.22);border-radius:16px;background:rgba(40,8,8,.6);backdrop-filter:blur(14px)}
+.warning .symbol{font-size:21px}
+.warning h3{color:#ffb0b0;font-size:13px;margin-bottom:6px}
+.warning p{color:#c9a1a1;font-size:11px;line-height:1.7}
+.warning ul{display:flex;flex-wrap:wrap;gap:7px 22px;margin-top:12px;list-style:none;color:#d2b0b0;font-size:11px}
+.warning li::before{content:"×";color:#ff7777;margin-right:7px}
 
-        .glow-text-subtle {
-            text-shadow: 0 0 10px var(--neon-glow);
-        }
+/* шаги */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
+.step{padding:19px;border:1px solid var(--line);border-radius:15px;background:rgba(10,20,12,.7);backdrop-filter:blur(10px)}
+.num{display:grid;place-items:center;width:30px;height:30px;border:1px solid rgba(0,255,65,.5);border-radius:9px;color:var(--neon);background:rgba(0,255,65,.06);font-weight:800;font-size:11px}
+.step h3{margin:14px 0 5px;font-size:13px;color:#eafff0}
+.step p{color:var(--muted);font-size:11px;line-height:1.6}
 
-        .neon-card {
-            background: var(--dark-card);
-            border: 1px solid rgba(0, 255, 65, 0.1);
-            border-radius: 14px;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            position: relative;
-            overflow: hidden;
-            transition: all 0.35s ease;
-        }
+/* статистика */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.stat{padding:17px;text-align:center;border:1px solid var(--line);border-radius:14px;background:rgba(10,20,12,.65)}
+.stat strong{display:block;color:var(--neon);font-size:18px;text-shadow:0 0 12px var(--neon-glow)}
+.stat span{display:block;margin-top:5px;color:var(--muted);font-size:9px;letter-spacing:.14em;text-transform:uppercase}
 
-        .neon-card:hover {
-            border-color: rgba(0, 255, 65, 0.3);
-            box-shadow: 0 0 30px rgba(0, 255, 65, 0.05);
-        }
+/* футер */
+.foot{display:flex;justify-content:space-between;gap:12px;margin-top:auto;padding:22px 0 30px;border-top:1px solid rgba(0,255,65,.1);color:#789080;font-size:10px}
+.foot a{color:#a8c6b1;text-decoration:none}
+.foot a:hover{color:var(--neon)}
 
-        .warning-card {
-            background: rgba(40, 8, 8, 0.7);
-            border: 1px solid rgba(255, 50, 50, 0.2);
-        }
+/* toast */
+.toast{position:fixed;left:50%;bottom:24px;z-index:20;transform:translate(-50%,16px);padding:11px 18px;
+  border:1px solid rgba(0,255,65,.55);border-radius:11px;background:#0c1a10;color:#eafff0;font-size:12px;
+  box-shadow:0 0 24px rgba(0,255,65,.15);opacity:0;pointer-events:none;transition:.22s}
+.toast.show{opacity:1;transform:translate(-50%,0)}
 
-        .warning-card:hover {
-            border-color: rgba(255, 80, 80, 0.35);
-            box-shadow: 0 0 20px rgba(255, 50, 50, 0.05);
-        }
+/* ===== адаптив ===== */
+@media(max-width:680px){
+  .wrap{width:calc(100% - 28px)}
+  .hero{padding:34px 0 40px}
+  .cards,.steps{grid-template-columns:1fr}
+  .heading{flex-direction:column;align-items:flex-start;gap:4px}
+  .foot{flex-direction:column}
+}
+@media(max-width:390px){
+  .cardfoot{flex-direction:column;align-items:stretch}
+  .copy{width:100%}
+  .stats{gap:6px}
+  .stat{padding:12px 5px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
-        .btn-neon {
-            position: relative;
-            background: transparent;
-            border: 1px solid rgba(0, 255, 65, 0.6);
-            color: var(--neon);
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 500;
-            cursor: pointer;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            letter-spacing: 0.5px;
-        }
-
-        .btn-neon:hover {
-            background: rgba(0, 255, 65, 0.08);
-            box-shadow: 0 0 15px var(--neon-glow);
-            text-shadow: 0 0 8px var(--neon-glow);
-        }
-
-        .btn-neon:active {
-            transform: scale(0.96);
-        }
-
-        .btn-neon.copied {
-            border-color: #00ff41;
-            background: rgba(0, 255, 65, 0.15);
-            color: #fff;
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
-        }
-
-        .badge-rec {
-            background: rgba(0, 255, 65, 0.12);
-            color: var(--neon);
-            border: 1px solid rgba(0, 255, 65, 0.25);
-            font-size: 9px;
-            padding: 2px 7px;
-            border-radius: 4px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .cursor-blink::after {
-            content: '█';
-            animation: blink 1s step-end infinite;
-            color: var(--neon);
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
-
-        .terminal-dots {
-            display: flex;
-            gap: 5px;
-        }
-
-        .terminal-dot {
-            width: 9px;
-            height: 9px;
-            border-radius: 50%;
-        }
-
-        .dot-red { background: #ff5f57; }
-        .dot-yellow { background: #ffbd2e; }
-        .dot-green { background: #28ca41; }
-
-        .status-dot {
-            width: 7px;
-            height: 7px;
-            background: var(--neon);
-            border-radius: 50%;
-            display: inline-block;
-            animation: status-pulse 1.5s ease-in-out infinite;
-            box-shadow: 0 0 6px var(--neon);
-        }
-
-        @keyframes status-pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(0.7); }
-        }
-
-        .ascii-border {
-            color: rgba(0, 255, 65, 0.25);
-            font-size: 11px;
-            line-height: 1;
-            user-select: none;
-        }
-
-        .particle {
-            position: fixed;
-            width: 2px;
-            height: 2px;
-            background: var(--neon);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 2;
-            opacity: 0;
-            animation: float-up 8s linear infinite;
-        }
-
-        @keyframes float-up {
-            0% { opacity: 0; transform: translateY(100vh) scale(0); }
-            10% { opacity: 0.5; }
-            90% { opacity: 0.15; }
-            100% { opacity: 0; transform: translateY(-10vh) scale(1); }
-        }
-
-        .step-num {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 26px;
-            height: 26px;
-            border: 1px solid rgba(0, 255, 65, 0.4);
-            border-radius: 6px;
-            color: var(--neon);
-            font-size: 11px;
-            font-weight: 700;
-            flex-shrink: 0;
-            background: rgba(0, 255, 65, 0.04);
-        }
-
-        .divider {
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(0,255,65,0.15), transparent);
-            margin: 2rem 0;
-        }
-
-        ::-webkit-scrollbar {
-            width: 5px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #0a0a0a;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: rgba(0, 255, 65, 0.25);
-            border-radius: 3px;
-        }
-
-        .logo-icon {
-            display: inline-block;
-            animation: logo-rotate 6s ease-in-out infinite;
-        }
-
-        @keyframes logo-rotate {
-            0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(4deg); }
-            75% { transform: rotate(-4deg); }
-        }
-
-        @media (max-width: 640px) {
-            .neon-card {
-                border-radius: 10px;
-            }
-        }
-    </style>
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:#0a0a0a}
+::-webkit-scrollbar-thumb{background:rgba(0,255,65,.25);border-radius:3px}
+</style>
 </head>
-<body class="scanlines grid-overlay">
+<body>
 
-    <canvas id="matrix-bg"></canvas>
-    <div id="particles"></div>
+<canvas id="matrix-bg"></canvas>
+<div id="particles"></div>
 
-    <div class="content-wrapper flex flex-col min-h-screen justify-between">
+<div class="wrap">
 
-        <main class="max-w-xl mx-auto px-5 py-10 sm:py-14 w-full">
+  <header class="top">
+    <div class="dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div>
+    <div class="online"><span class="status-dot"></span>ONLINE</div>
+  </header>
 
-            <!-- Terminal Header -->
-            <div class="flex items-center justify-between mb-12">
-                <div class="terminal-dots">
-                    <div class="terminal-dot dot-red"></div>
-                    <div class="terminal-dot dot-yellow"></div>
-                    <div class="terminal-dot dot-green"></div>
-                </div>
-                <div class="text-[10px] text-green-500/50 flex items-center gap-2">
-                    <span class="status-dot"></span>
-                    <span>ONLINE</span>
-                </div>
-            </div>
+  <main>
 
-            <!-- Header -->
-            <div class="text-center mb-14">
-                <pre class="ascii-border mb-5 text-[9px] sm:text-[10px] leading-tight hidden sm:block" aria-hidden="true">
- ╔══════════════════════════════════════════╗
- ║   ███████╗ █████╗  ██████╗  █████╗     ║
- ║   ╚══███╔╝██╔══██╗██╔════╝ ██╔══██╗    ║
- ║     ███╔╝ ███████║██║  ███╗███████║    ║
- ║    ███╔╝  ██╔══██║██║   ██║██╔══██║    ║
- ║   ███████╗██║  ██║╚██████╔╝██║  ██║    ║
- ║   ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝    ║
- ╚══════════════════════════════════════════╝</pre>
-
-                <h1 class="text-3xl sm:text-4xl font-extrabold glow-text mb-3 tracking-wider">
-                    <span class="logo-icon">🛡️</span> ZAGA VPN
-                </h1>
-                <p class="text-green-500/40 text-xs tracking-widest uppercase mb-3">Free Proxy Service</p>
-                <p class="text-green-500/30 text-xs font-light cursor-blink">Подключение через Hiddify</p>
-            </div>
-
-            <!-- Warning -->
-            <div class="warning-card neon-card p-5 sm:p-6 mb-12">
-                <div class="flex items-center gap-2 mb-4">
-                    <span class="text-base">⚠️</span>
-                    <h2 class="text-red-400/90 font-semibold text-xs uppercase tracking-wider">Внимание</h2>
-                </div>
-                <p class="text-[11px] text-red-300/50 mb-4 border-l border-red-500/20 pl-3 leading-relaxed">
-                    Сервис на основе открытых прокси из публичных источников. Автор не несёт ответственности за безопасность.
-                </p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5 text-[11px]">
-                    <div class="flex items-center gap-2 text-red-400/70">
-                        <span class="text-[10px]">⛔</span>
-                        <span>Пароли, банкинг — запрещено</span>
-                    </div>
-                    <div class="flex items-center gap-2 text-green-400/50">
-                        <span class="text-[10px]">✓</span>
-                        <span>Instagram, Telegram, YouTube</span>
-                    </div>
-                    <div class="flex items-center gap-2 text-red-400/70">
-                        <span class="text-[10px]">✗</span>
-                        <span>На свой страх и риск</span>
-                    </div>
-                    <div class="flex items-center gap-2 text-green-400/50">
-                        <span class="text-[10px]">✓</span>
-                        <span>Только просмотр контента</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Subscription Links -->
-            <div class="mb-12">
-                <div class="flex items-center gap-3 mb-5">
-                    <span class="text-sm">⚡</span>
-                    <h2 class="text-sm font-semibold glow-text-subtle tracking-wide">Подключение</h2>
-                </div>
-
-                <div class="space-y-3">
-                    <!-- WARP -->
-                    <div class="neon-card p-4 flex items-center justify-between gap-3">
-                        <div class="flex items-center gap-3">
-                            <span class="text-lg">🚀</span>
-                            <div>
-                                <div class="flex items-center gap-2">
-                                    <span class="font-semibold text-white text-sm">WARP</span>
-                                    <span class="badge-rec">REC</span>
-                                </div>
-                                <p class="text-[10px] text-green-500/35 mt-0.5">Cloudflare • Быстрый</p>
-                            </div>
-                        </div>
-                        <button onclick="copyLink('https://raw.githubusercontent.com/zaga/vpn/warp/config', this)" 
-                                class="btn-neon text-[11px] px-4 py-2 rounded-lg whitespace-nowrap">
-                            Копировать
-                        </button>
-                    </div>
-
-                    <!-- VPN PROXY -->
-                    <div class="neon-card p-4 flex items-center justify-between gap-3">
-                        <div class="flex items-center gap-3">
-                            <span class="text-lg">🌐</span>
-                            <div>
-                                <span class="font-semibold text-white text-sm">VPN PROXY</span>
-                                <p class="text-[10px] text-green-500/35 mt-0.5">RU / USA / EU серверы</p>
-                            </div>
-                        </div>
-                        <button onclick="copyLink('https://raw.githubusercontent.com/zaga/vpn/proxy/config', this)" 
-                                class="btn-neon text-[11px] px-4 py-2 rounded-lg whitespace-nowrap">
-                            Копировать
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Instructions -->
-            <div class="mb-12">
-                <div class="flex items-center gap-3 mb-5">
-                    <span class="text-sm">📋</span>
-                    <h2 class="text-sm font-semibold glow-text-subtle tracking-wide">Инструкция</h2>
-                </div>
-
-                <div class="space-y-4">
-                    <div class="flex items-start gap-3">
-                        <span class="step-num">1</span>
-                        <div>
-                            <p class="text-green-100/80 text-xs font-medium">Установите Hiddify</p>
-                            <p class="text-green-500/35 text-[10px] mt-0.5">Android, iOS, Windows, macOS, Linux</p>
-                        </div>
-                    </div>
-                    <div class="flex items-start gap-3">
-                        <span class="step-num">2</span>
-                        <div>
-                            <p class="text-green-100/80 text-xs font-medium">Импортируйте подписку</p>
-                            <p class="text-green-500/35 text-[10px] mt-0.5">«+» → «Добавить профиль» → вставьте ссылку</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Stats -->
-            <div class="flex items-center justify-center gap-8 sm:gap-12 text-center">
-                <div>
-                    <div class="glow-text text-base sm:text-lg font-bold" id="uptime">99.7%</div>
-                    <div class="text-[9px] text-green-500/30 uppercase tracking-wider mt-1">Uptime</div>
-                </div>
-                <div class="w-px h-6 bg-green-500/10"></div>
-                <div>
-                    <div class="glow-text text-base sm:text-lg font-bold" id="servers">47</div>
-                    <div class="text-[9px] text-green-500/30 uppercase tracking-wider mt-1">Серверов</div>
-                </div>
-                <div class="w-px h-6 bg-green-500/10"></div>
-                <div>
-                    <div class="glow-text text-base sm:text-lg font-bold" id="users">2.4K</div>
-                    <div class="text-[9px] text-green-500/30 uppercase tracking-wider mt-1">Юзеров</div>
-                </div>
-            </div>
-
-        </main>
-
-        <footer class="text-center py-8 px-4">
-            <p class="text-[10px] text-green-500/20 tracking-wider">
-                ZAGA VPN © 2026 • auto-updated every 6h
-            </p>
-        </footer>
-
+    <!-- HERO: только ASCII-лого -->
+    <div class="hero">
+<pre class="ascii" id="logo" aria-hidden="true">
+███████╗  █████╗   ██████╗   █████╗    ██╗   ██╗ ██████╗  ███╗   ██╗
+╚══███╔╝ ██╔══██╗ ██╔════╝  ██╔══██╗   ██║   ██║ ██╔══██╗ ████╗  ██║
+  ███╔╝  ███████║ ██║  ███╗ ███████║   ██║   ██║ ██████╔╝ ██╔██╗ ██║
+ ███╔╝   ██╔══██║ ██║   ██║ ██╔══██║   ╚██╗ ██╔╝ ██╔═══╝  ██║╚██╗██║
+███████╗ ██║  ██║ ╚██████╔╝ ██║  ██║    ╚████╔╝  ██║      ██║ ╚████║
+╚══════╝ ╚═╝  ╚═╝  ╚═════╝  ╚═╝  ╚═╝     ╚═══╝   ╚═╝      ╚═╝  ╚═══╝</pre>
+      <p class="sub">Free Proxy Service</p>
+      <p class="hint cursor-blink">Подключение через Hiddify</p>
+      <div class="actions">
+        <a class="btn" href="#subscriptions">Выбрать подключение ↓</a>
+        <a class="btn ghost" href="https://hiddify.com/" target="_blank" rel="noopener noreferrer">Скачать Hiddify ↗</a>
+      </div>
     </div>
 
-    <script>
-        // Matrix Rain
-        const canvas = document.getElementById('matrix-bg');
-        const ctx = canvas.getContext('2d');
+    <!-- 01 / ПОДКЛЮЧЕНИЕ -->
+    <section id="subscriptions">
+      <div class="heading">
+        <div><div class="kicker">01 / ПОДКЛЮЧЕНИЕ</div><h2>Выбери свой маршрут</h2></div>
+        <div class="hint-r">Исходные подписки GitHub</div>
+      </div>
+      <div class="cards">
+        <article class="card">
+          <div class="cardtop"><div class="ico">⚡</div><span class="tag">WARP</span></div>
+          <h3>Cloudflare WARP</h3>
+          <p>Подборка WARP-конфигураций. Импортируйте ссылку в Hiddify как профиль подписки.</p>
+          <div class="cardfoot">
+            <span class="meta">Обновление профиля: 24 ч</span>
+            <button class="copy" data-copy="https://raw.githubusercontent.com/Zagidin/zaga_sub_warp/main/warp">⧉ Скопировать ссылку</button>
+          </div>
+        </article>
+        <article class="card">
+          <div class="cardtop"><div class="ico">🌐</div><span class="tag">RU / USA</span></div>
+          <h3>VPN Proxy</h3>
+          <p>Список прокси-конфигураций разных регионов. Состав подписки может меняться.</p>
+          <div class="cardfoot">
+            <span class="meta">Обновление профиля: 1 ч</span>
+            <button class="copy" data-copy="https://raw.githubusercontent.com/Zagidin/zaga_sub_warp/main/zaga_vpn_ru_usa.txt">⧉ Скопировать ссылку</button>
+          </div>
+        </article>
+      </div>
+    </section>
 
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
+    <!-- 02 / ВАЖНО ЗНАТЬ -->
+    <section>
+      <div class="heading">
+        <div><div class="kicker">02 / ВАЖНО ЗНАТЬ</div><h2>Используйте осознанно</h2></div>
+      </div>
+      <div class="warning">
+        <div class="symbol">⚠️</div>
+        <div>
+          <h3>Публичные прокси — это риск</h3>
+          <p>Списки получены из публичных источников. Оператор сайта не контролирует сторонние серверы и не может гарантировать их безопасность, конфиденциальность или доступность.</p>
+          <ul>
+            <li>Не вводите пароли и платёжные данные</li>
+            <li>Не используйте для банкинга</li>
+            <li>Подключайтесь на свой страх и риск</li>
+          </ul>
+        </div>
+      </div>
+    </section>
 
-        const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ZAGA{}[]<>/\\|';
-        const charArr = chars.split('');
-        const fontSize = 14;
-        let columns = Math.floor(canvas.width / fontSize);
-        let drops = Array(columns).fill(1);
+    <!-- 03 / БЫСТРЫЙ СТАРТ -->
+    <section>
+      <div class="heading">
+        <div><div class="kicker">03 / БЫСТРЫЙ СТАРТ</div><h2>Как подключиться</h2></div>
+      </div>
+      <div class="steps">
+        <article class="step"><div class="num">01</div><h3>Установите Hiddify</h3><p>Скачайте приложение для Android, iOS, Windows или macOS с официального сайта.</p></article>
+        <article class="step"><div class="num">02</div><h3>Скопируйте подписку</h3><p>Нажмите «Скопировать ссылку» у нужной конфигурации выше.</p></article>
+        <article class="step"><div class="num">03</div><h3>Добавьте профиль</h3><p>В Hiddify нажмите «+» → «Добавить профиль» и вставьте ссылку.</p></article>
+      </div>
+    </section>
 
-        function drawMatrix() {
-            ctx.fillStyle = 'rgba(5, 10, 5, 0.08)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#00ff41';
-            ctx.font = fontSize + 'px monospace';
+    <!-- 04 / ИСТОЧНИКИ -->
+    <section>
+      <div class="heading">
+        <div><div class="kicker">04 / ИСТОЧНИКИ</div><h2>Подписки и обновления</h2></div>
+      </div>
+      <div class="stats">
+        <div class="stat"><strong>GitHub</strong><span>Источник конфигураций</span></div>
+        <div class="stat"><strong>24 / 1 ч</strong><span>Интервалы обновления</span></div>
+        <div class="stat"><strong>Hiddify</strong><span>Клиент подключения</span></div>
+      </div>
+    </section>
 
-            for (let i = 0; i < drops.length; i++) {
-                const text = charArr[Math.floor(Math.random() * charArr.length)];
-                ctx.fillStyle = `rgba(0, 255, 65, ${Math.random() * 0.4 + 0.1})`;
-                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-                drops[i]++;
-            }
-        }
-        setInterval(drawMatrix, 50);
+  </main>
 
-        window.addEventListener('resize', () => {
-            columns = Math.floor(canvas.width / fontSize);
-            drops = Array(columns).fill(1);
-        });
+  <footer class="foot">
+    <span>© 2026 ZAGA VPN · Публичный сервис</span>
+    <a href="https://github.com/Zagidin/zaga_sub_warp" target="_blank" rel="noopener noreferrer">GitHub репозиторий ↗</a>
+  </footer>
 
-        // Particles
-        const particlesContainer = document.getElementById('particles');
-        for (let i = 0; i < 12; i++) {
-            const p = document.createElement('div');
-            p.className = 'particle';
-            p.style.left = Math.random() * 100 + '%';
-            p.style.animationDelay = Math.random() * 8 + 's';
-            p.style.animationDuration = (7 + Math.random() * 5) + 's';
-            particlesContainer.appendChild(p);
-        }
+</div>
 
-        // Copy Link
-        function copyLink(url, button) {
-            const original = button.textContent;
-            navigator.clipboard.writeText(url).then(() => {
-                button.classList.add('copied');
-                button.textContent = '✓ Готово';
-                setTimeout(() => {
-                    button.classList.remove('copied');
-                    button.textContent = original;
-                }, 1800);
-            }).catch(() => {
-                const ta = document.createElement('textarea');
-                ta.value = url;
-                document.body.appendChild(ta);
-                ta.select();
-                document.execCommand('copy');
-                document.body.removeChild(ta);
-                button.classList.add('copied');
-                button.textContent = '✓ Готово';
-                setTimeout(() => {
-                    button.classList.remove('copied');
-                    button.textContent = original;
-                }, 1800);
-            });
-        }
+<div class="toast" id="toast" role="status" aria-live="polite">Ссылка скопирована</div>
 
-        // Stats animation
-        function animateValue(el, start, end, duration, suffix = '') {
-            let startTs = null;
-            const step = (ts) => {
-                if (!startTs) startTs = ts;
-                const progress = Math.min((ts - startTs) / duration, 1);
-                const eased = 1 - Math.pow(1 - progress, 3);
-                let val = eased * (end - start) + start;
-                if (suffix === '%') el.textContent = val.toFixed(1) + suffix;
-                else if (suffix === 'K') el.textContent = val.toFixed(1) + suffix;
-                else el.textContent = Math.floor(val) + suffix;
-                if (progress < 1) requestAnimationFrame(step);
-            };
-            requestAnimationFrame(step);
-        }
+<script>
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        const observer = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting) {
-                animateValue(document.getElementById('uptime'), 0, 99.7, 1400, '%');
-                animateValue(document.getElementById('servers'), 0, 47, 1100, '');
-                animateValue(document.getElementById('users'), 0, 2.4, 1300, 'K');
-                observer.disconnect();
-            }
-        }, { threshold: 0.5 });
-        observer.observe(document.getElementById('uptime'));
+/* ===== Matrix rain ===== */
+if (!reduce) {
+  const canvas = document.getElementById('matrix-bg');
+  const ctx = canvas.getContext('2d');
+  const resize = () => { canvas.width = innerWidth; canvas.height = innerHeight; };
+  resize(); addEventListener('resize', resize);
 
-        // Easter egg
-        let clicks = 0;
-        document.querySelector('h1')?.addEventListener('click', () => {
-            clicks++;
-            if (clicks >= 5) {
-                document.body.style.filter = 'hue-rotate(180deg)';
-                setTimeout(() => { document.body.style.filter = ''; }, 3000);
-                clicks = 0;
-            }
-        });
-    </script>
+  const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ZAGA{}[]<>/\\|'.split('');
+  const fs = 14;
+  let cols = Math.floor(canvas.width / fs);
+  let drops = Array(cols).fill(1);
+
+  setInterval(() => {
+    ctx.fillStyle = 'rgba(5,10,5,0.08)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.font = fs + 'px monospace';
+    for (let i = 0; i < drops.length; i++) {
+      ctx.fillStyle = `rgba(0,255,65,${Math.random() * 0.4 + 0.1})`;
+      ctx.fillText(chars[Math.random() * chars.length | 0], i * fs, drops[i] * fs);
+      if (drops[i] * fs > canvas.height && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    }
+  }, 50);
+  addEventListener('resize', () => { cols = Math.floor(canvas.width / fs); drops = Array(cols).fill(1); });
+
+  /* частицы */
+  const pc = document.getElementById('particles');
+  for (let i = 0; i < 10; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.animationDelay = Math.random() * 8 + 's';
+    p.style.animationDuration = (7 + Math.random() * 5) + 's';
+    pc.appendChild(p);
+  }
+}
+
+/* ===== копирование + toast ===== */
+const toast = document.getElementById('toast');
+let timer;
+function notify(text) {
+  toast.textContent = text;
+  toast.classList.add('show');
+  clearTimeout(timer);
+  timer = setTimeout(() => toast.classList.remove('show'), 2200);
+}
+async function copyText(value) {
+  if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(value); return; }
+  const f = document.createElement('textarea');
+  f.value = value; f.style.position = 'fixed'; f.style.opacity = '0';
+  document.body.appendChild(f); f.select();
+  const ok = document.execCommand('copy'); f.remove();
+  if (!ok) throw new Error('copy failed');
+}
+document.querySelectorAll('[data-copy]').forEach(btn => btn.addEventListener('click', async () => {
+  try {
+    await copyText(btn.dataset.copy);
+    const old = btn.textContent;
+    btn.textContent = '✓ Скопировано';
+    btn.classList.add('done');
+    notify('Ссылка скопирована в буфер обмена');
+    setTimeout(() => { btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  } catch (e) {
+    notify('Не удалось скопировать. Откройте ссылку вручную.');
+  }
+}));
+
+/* ===== пасхалка: 5 кликов по лого ===== */
+let clicks = 0;
+document.getElementById('logo')?.addEventListener('click', () => {
+  if (++clicks >= 5) {
+    document.body.style.filter = 'hue-rotate(180deg)';
+    setTimeout(() => document.body.style.filter = '', 3000);
+    clicks = 0;
+  }
+});
+</script>
 </body>
 </html>
