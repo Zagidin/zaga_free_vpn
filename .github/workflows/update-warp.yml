@@ -29,7 +29,7 @@ jobs:
 
           SOURCE_URL = "https://raw.githubusercontent.com/hiddify/hiddify-app/refs/heads/main/test.configs/warp"
           OUTPUT_FILE = "warp"
-          PROFILE_NAME = "ZAGA"
+          PROFILE_NAME = "🔥 ZAGA WARP 🔥"
 
           print(f"Downloading: {SOURCE_URL}")
 
