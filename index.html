@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔥 ZAGA FREE VPN 🔥</title>
+    <script src="https://tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex flex-col justify-between">
+
+    <main class="max-w-2xl mx-auto px-4 py-12">
+        <!-- Header -->
+        <div class="text-center mb-10">
+            <h1 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-600 mb-2">
+                🔥 ZAGA FREE VPN 🔥
+            </h1>
+            <p class="text-slate-400">Быстрое подключение через клиент Hiddify</p>
+        </div>
+
+        <!-- Warning Card -->
+        <div class="bg-red-950/40 border border-red-800 rounded-2xl p-6 mb-8 backdrop-blur-sm">
+            <h2 class="text-red-400 font-bold text-lg mb-3 flex items-center gap-2">
+                ❗ ВАЖНО ПЕРЕД ИСПОЛЬЗОВАНИЕМ
+            </h2>
+            <p class="text-sm text-red-200/80 mb-3 italic">😳 Внимание: сервис собран на основе открытых прокси-серверов.</p>
+            <ul class="space-y-2 text-sm text-slate-300">
+                <li class="flex items-start gap-2">❌ <span><b>Автор не несет ответственности</b> за безопасность данных из открытых источников.</span></li>
+                <li class="flex items-start gap-2">❌ <span>Используйте этот VPN <b>на свой страх и риск</b>.</span></li>
+                <li class="flex items-start gap-2">🛑 <span class="text-red-400 font-semibold">КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО вводить пароли, документы или заходить в онлайн-банкинг.</span></li>
+                <li class="flex items-start gap-2">✅ <span>Используйте строго для просмотра контента (Instagram, Telegram, WhatsApp, YouTube).</span></li>
+            </ul>
+        </div>
+
+        <!-- Instructions -->
+        <div class="bg-slate-800/60 border border-slate-700 rounded-2xl p-6 mb-8">
+            <h2 class="text-xl font-bold mb-4 text-orange-400">⚡ Как использовать</h2>
+            <ol class="space-y-4 text-slate-300">
+                <li>
+                    <span class="font-semibold text-white">1. Установите Hiddify:</span> 
+                    Скачайте приложение на Android, iOS, Windows, macOS или Linux.
+                </li>
+                <li>
+                    <span class="font-semibold text-white">2. Импортируйте подписку:</span> 
+                    Нажмите «Добавить профиль» (или кнопку "+") и вставьте одну из ссылок ниже.
+                </li>
+            </ol>
+        </div>
+
+        <!-- Subscription Links -->
+        <div class="space-y-4">
+            <!-- Link 1 -->
+            <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div>
+                    <h3 class="font-bold text-white flex items-center gap-2">🚀 WARP <span class="text-xs bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded">Рекомендуется</span></h3>
+                    <p class="text-xs text-slate-400">Трафик от Cloudflare</p>
+                </div>
+                <button onclick="copyLink('https://githubusercontent.com', this)" class="w-full sm:w-auto bg-orange-600 hover:bg-orange-500 text-white font-medium text-sm px-4 py-2 rounded-lg transition-colors duration-200">
+                    Копировать URL
+                </button>
+            </div>
+
+            <!-- Link 2 -->
+            <div class="bg-slate-800 border border-slate-700 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div>
+                    <h3 class="font-bold text-white flex items-center gap-2">🌐 VPN PROXY</h3>
+                    <p class="text-xs text-slate-400">Публичные прокси (RU/USA)</p>
+                </div>
+                <button onclick="copyLink('https://githubusercontent.com', this)" class="w-full sm:w-auto bg-slate-700 hover:bg-slate-600 text-white font-medium text-sm px-4 py-2 rounded-lg transition-colors duration-200">
+                    Копировать URL
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center py-6 text-xs text-slate-500">
+        ZAGA VPN © 2026 • Работает автоматически через GitHub Actions
+    </footer>
+
+    <script>
+        function copyLink(url, button) {
+            navigator.clipboard.writeText(url).then(() => {
+                const originalText = button.innerText;
+                button.innerText = 'Скопировано! ✓';
+                button.classList.remove('bg-orange-600', 'bg-slate-700');
+                button.classList.add('bg-green-600');
+                
+                setTimeout(() => {
+                    button.innerText = originalText;
+                    button.classList.remove('bg-green-600');
+                    if(originalText.includes('WARP')) {
+                        button.classList.add('bg-orange-600');
+                    } else {
+                        button.classList.add('bg-slate-700');
+                    }
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
