@@ -77,13 +77,14 @@ body::after{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;
 .plat:hover{transform:translateY(-3px);color:var(--neon)}
 .plat:hover .plat-ico{border-color:rgba(0,255,65,.5);background:rgba(0,255,65,.08);box-shadow:0 0 16px rgba(0,255,65,.18)}
 .plat:hover .plat-name{color:var(--neon)}
-/* определённое устройство пользователя */
 .plat.mine .plat-ico{border-color:rgba(0,255,65,.65);background:rgba(0,255,65,.1);box-shadow:0 0 18px rgba(0,255,65,.22)}
 .plat.mine .plat-name{color:var(--neon);font-weight:700}
 .plat.mine .plat-ico::before{content:"";position:absolute;top:-4px;right:-4px;width:9px;height:9px;border-radius:50%;
   background:var(--neon);box-shadow:0 0 9px var(--neon);animation:pulse 1.5s ease-in-out infinite}
-.install-hint{margin-top:16px;font-size:10px;line-height:1.7;color:rgba(0,255,65,.35)}
-.install-hint b{color:rgba(0,255,65,.6);font-weight:700}
+.install-hint{margin-top:18px;font-size:clamp(11px,1.7vw,13px);line-height:1.85;color:rgba(0,255,65,.5)}
+.install-hint b{color:var(--neon);font-weight:800;text-shadow:0 0 8px var(--neon-glow)}
+.install-hint .emo{display:inline-block;animation:point 1.2s ease-in-out infinite}
+@keyframes point{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 
 /* ===== секции ===== */
 section{margin:14px 0 54px}
@@ -233,7 +234,7 @@ section{margin:14px 0 54px}
 █████╗   ██████╔╝ █████╗   █████╗     ██║   ██║ ██████╔╝ ████╗ ██║
 ██╔══╝   ██╔══██╗ ██╔══╝   ██╔══╝     ╚██╗ ██╔╝ ██╔═══╝  ██║╚██╗██║
 ██║      ██║  ██║ ███████╗ ███████╗    ╚████╔╝  ██║      ██║ ╚████║
-╚═╝      ╚═╝  ╚═╝ ══════╝ ╚══════╝     ╚═══╝   ╚═╝      ╚═╝  ╚═══╝</pre>
+╚═╝      ╚═╝  ╚═╝ ╚══════╝ ╚══════╝     ╚═══╝   ╚═╝      ╚═╝  ╚═══╝</pre>
         </div>
         <span class="fire" aria-hidden="true">🔥</span>
       </div>
@@ -286,7 +287,7 @@ section{margin:14px 0 54px}
         </div>
         <p class="install-hint">
           Нажмите на свою платформу — <b>скачивание установщика начнётся сразу</b>.<br>
-          Ваше устройство определено автоматически и помечено зелёной точкой.
+          <span id="platHint">Ваше устройство определено автоматически и помечено зелёной точкой.</span>
         </p>
       </div>
     </div>
@@ -354,7 +355,7 @@ section{margin:14px 0 54px}
       <div class="steps">
         <article class="step"><div class="num">01</div><h3>Установите Hiddify</h3><p>Нажмите на иконку своей платформы в шапке сайта — установщик скачается сразу.</p></article>
         <article class="step"><div class="num">02</div><h3>Скопируйте подписку</h3><p>Нажмите «Скопировать» или покажите QR-код у нужной конфигурации.</p></article>
-        <article class="step"><div class="num">03</div><h3>Добавьте профиль</h3><p>В Hiddify нажмите «+» → «Вставить из буфера обмена» и вставьте ссылку или отсканируйте QR.</p></article>
+        <article class="step"><div class="num">03</div><h3>Добавьте профиль</h3><p>В Hiddify нажмите «+» → «Добавить профиль» и вставьте ссылку или отсканируйте QR.</p></article>
       </div>
     </section>
 
@@ -444,6 +445,7 @@ if (!reduce) {
 /* ===== автоопределение платформы пользователя ===== */
 (() => {
   const ua = navigator.userAgent;
+  const names = { android: 'Android', ios: 'iOS', macos: 'macOS', windows: 'Windows', linux: 'Linux' };
   let plat = null;
   if (/android/i.test(ua)) plat = 'android';
   else if (/iphone|ipad|ipod/i.test(ua)) plat = 'ios';
@@ -453,6 +455,9 @@ if (!reduce) {
   if (plat) {
     const el = document.querySelector(`.plat[data-plat="${plat}"]`);
     if (el) { el.classList.add('mine'); el.title = 'Ваше устройство'; }
+    const hint = document.getElementById('platHint');
+    if (hint) hint.innerHTML =
+      `<span class="emo">👆</span> Ваша система — <b>${names[plat]}</b>: скачайте программу, нажав на кнопку выше.`;
   }
 })();
 
