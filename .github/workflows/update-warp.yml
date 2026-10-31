@@ -1,7 +1,10 @@
 name: Update ZAGA subscription
 
 on:
+  # Возможность запустить вручную
   workflow_dispatch:
+
+  # Автоматическое обновление каждые 30 минут
   schedule:
     - cron: "*/30 * * * *"
 
@@ -14,41 +17,82 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
-      - name: Download and modify config
+      - name: Download and modify WARP config
         run: |
           python3 <<'PY'
           import urllib.request
+          import base64
           import re
+          import sys
 
-          URL = "https://raw.githubusercontent.com/hiddify/hiddify-app/refs/heads/main/test.configs/warp"
-          OUTPUT = "warp"
+          SOURCE_URL = "https://raw.githubusercontent.com/hiddify/hiddify-app/refs/heads/main/test.configs/warp"
+          OUTPUT_FILE = "warp"
+          PROFILE_NAME = "ZAGA"
 
-          with urllib.request.urlopen(URL) as response:
-              text = response.read().decode("utf-8")
+          print(f"Downloading: {SOURCE_URL}")
+
+          request = urllib.request.Request(
+              SOURCE_URL,
+              headers={
+                  "User-Agent": "Mozilla/5.0 GitHub-Actions-ZAGA"
+              }
+          )
+
+          try:
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  text = response.read().decode("utf-8")
+          except Exception as e:
+              print(f"ERROR: Could not download original config: {e}")
+              sys.exit(1)
+
+          # Проверяем, что GitHub действительно вернул WARP/Psiphon конфиг,
+          # а не HTML-страницу ошибки или пустой файл.
+          if "warp://" not in text and "psiphon://" not in text:
+              print("ERROR: Downloaded file does not look like a valid WARP config.")
+              sys.exit(1)
+
+          # Кодируем название профиля так же, как в оригинальном конфиге Hiddify.
+          encoded_name = base64.b64encode(
+              PROFILE_NAME.encode("utf-8")
+          ).decode("ascii")
+
+          profile_line = f"//profile-title: base64:{encoded_name}"
+
+          print(f"Profile name: {PROFILE_NAME}")
+          print(f"Base64: {encoded_name}")
+          print(f"Result: {profile_line}")
 
           lines = text.splitlines()
 
           found = False
 
-          # Hiddify looks for metadata near the beginning
+          # Ищем profile-title в первых строках файла.
           for i in range(min(10, len(lines))):
-              if re.match(r'^\s*(//|#)\s*profile-title\s*:', lines[i], re.I):
-                  lines[i] = "//profile-title: ZAGA"
+              if re.match(
+                  r'^\s*(//|#)\s*profile-title\s*:',
+                  lines[i],
+                  re.IGNORECASE
+              ):
+                  lines[i] = profile_line
                   found = True
                   break
 
+          # Если по какой-то причине строки нет — добавляем её первой.
           if not found:
-              lines.insert(0, "//profile-title: ZAGA")
+              lines.insert(0, profile_line)
 
-          with open(OUTPUT, "w", encoding="utf-8", newline="\n") as f:
-              f.write("\n".join(lines) + "\n")
+          result = "\n".join(lines) + "\n"
 
-          print("ZAGA config generated")
+          with open(OUTPUT_FILE, "w", encoding="utf-8", newline="\n") as f:
+              f.write(result)
+
+          print("Config successfully generated.")
+          print(f"Saved to: {OUTPUT_FILE}")
           PY
 
-      - name: Commit changes
+      - name: Commit updated config
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -56,9 +100,9 @@ jobs:
           git add warp
 
           if git diff --cached --quiet; then
-            echo "No changes"
+            echo "No changes in WARP config."
             exit 0
           fi
 
-          git commit -m "Update ZAGA subscription"
+          git commit -m "Update ZAGA WARP subscription"
           git push
