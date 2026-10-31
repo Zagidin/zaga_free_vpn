@@ -1,0 +1,183 @@
+name: Update ZAGA VPN RU USA
+
+on:
+  workflow_dispatch:
+
+  schedule:
+    - cron: "*/30 * * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-zaga-ru-usa
+  cancel-in-progress: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Download and filter RU + USA servers
+        run: |
+          python3 <<'PY'
+          import urllib.request
+          import urllib.parse
+          import base64
+          import re
+          import sys
+
+          SOURCE_URL = "https://raw.githubusercontent.com/4n0nymou3/multi-proxy-config-fetcher/refs/heads/main/configs/proxy_configs.txt"
+          OUTPUT_FILE = "zaga_vpn_ru_usa.txt"
+          PROFILE_NAME = "🔥 ZAGA VPN 🔥 (RU-USA)"
+
+          print("Downloading source...")
+          print(SOURCE_URL)
+
+          request = urllib.request.Request(
+              SOURCE_URL,
+              headers={
+                  "User-Agent": "Mozilla/5.0 ZAGA-GitHub-Action"
+              }
+          )
+
+          try:
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  text = response.read().decode("utf-8")
+          except Exception as e:
+              print(f"ERROR downloading source: {e}")
+              sys.exit(1)
+
+          if len(text.strip()) < 100:
+              print("ERROR: Source file is empty or too small.")
+              sys.exit(1)
+
+          print(f"Downloaded {len(text)} characters")
+
+          ru_servers = []
+          us_servers = []
+
+          for raw_line in text.splitlines():
+              line = raw_line.strip()
+
+              if not line:
+                  continue
+
+              # Пропускаем metadata исходной подписки
+              if line.startswith("//") or line.startswith("#"):
+                  continue
+
+              # Название сервера находится после #
+              if "#" not in line:
+                  continue
+
+              fragment = line.split("#", 1)[1]
+
+              # На случай URL encoded названий
+              fragment = urllib.parse.unquote(fragment)
+
+              # Ищем именно country code в названии:
+              # "... - US - ..."
+              # "... - RU - ..."
+              if re.search(r"\s-\sUS\s-\s", fragment, re.IGNORECASE):
+                  us_servers.append(line)
+
+              elif re.search(r"\s-\sRU\s-\s", fragment, re.IGNORECASE):
+                  ru_servers.append(line)
+
+          print(f"USA servers found: {len(us_servers)}")
+          print(f"Russia servers found: {len(ru_servers)}")
+
+          total = len(us_servers) + len(ru_servers)
+
+          if total == 0:
+              print("ERROR: No RU or US servers found.")
+              sys.exit(1)
+
+          # Название профиля в Base64 для Hiddify
+          encoded_title = base64.b64encode(
+              PROFILE_NAME.encode("utf-8")
+          ).decode("ascii")
+
+          output = []
+
+          output.append(
+              f"//profile-title: base64:{encoded_title}"
+          )
+
+          # Hiddify будет предлагать обновление каждый час
+          output.append(
+              "//profile-update-interval: 1"
+          )
+
+          output.append("")
+
+          # Сначала USA
+          output.extend(us_servers)
+
+          output.append("")
+
+          # Потом Россия
+          output.extend(ru_servers)
+
+          output.append("")
+
+          result = "\n".join(output)
+
+          with open(
+              OUTPUT_FILE,
+              "w",
+              encoding="utf-8",
+              newline="\n"
+          ) as f:
+              f.write(result)
+
+          print("")
+          print("=================================")
+          print("ZAGA subscription generated")
+          print(f"USA:    {len(us_servers)}")
+          print(f"Russia: {len(ru_servers)}")
+          print(f"TOTAL:  {total}")
+          print("=================================")
+
+          PY
+
+      - name: Validate generated file
+        run: |
+          set -e
+
+          if [ ! -s zaga_vpn_ru_usa.txt ]; then
+            echo "ERROR: generated file is empty"
+            exit 1
+          fi
+
+          echo "File size:"
+          wc -c zaga_vpn_ru_usa.txt
+
+          echo ""
+          echo "Number of configs:"
+          grep -E -c '^[a-zA-Z0-9+.-]+://' zaga_vpn_ru_usa.txt || true
+
+          echo ""
+          echo "First lines:"
+          head -n 10 zaga_vpn_ru_usa.txt
+
+      - name: Commit and push
+        run: |
+          set -e
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add zaga_vpn_ru_usa.txt
+
+          if git diff --cached --quiet; then
+            echo "No changes."
+            exit 0
+          fi
+
+          git commit -m "Update ZAGA VPN RU USA servers"
+          git push
