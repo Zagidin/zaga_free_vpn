@@ -1,0 +1,64 @@
+name: Update ZAGA subscription
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/30 * * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download and modify config
+        run: |
+          python3 <<'PY'
+          import urllib.request
+          import re
+
+          URL = "https://raw.githubusercontent.com/hiddify/hiddify-app/refs/heads/main/test.configs/warp"
+          OUTPUT = "warp"
+
+          with urllib.request.urlopen(URL) as response:
+              text = response.read().decode("utf-8")
+
+          lines = text.splitlines()
+
+          found = False
+
+          # Hiddify looks for metadata near the beginning
+          for i in range(min(10, len(lines))):
+              if re.match(r'^\s*(//|#)\s*profile-title\s*:', lines[i], re.I):
+                  lines[i] = "//profile-title: ZAGA"
+                  found = True
+                  break
+
+          if not found:
+              lines.insert(0, "//profile-title: ZAGA")
+
+          with open(OUTPUT, "w", encoding="utf-8", newline="\n") as f:
+              f.write("\n".join(lines) + "\n")
+
+          print("ZAGA config generated")
+          PY
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add warp
+
+          if git diff --cached --quiet; then
+            echo "No changes"
+            exit 0
+          fi
+
+          git commit -m "Update ZAGA subscription"
+          git push
