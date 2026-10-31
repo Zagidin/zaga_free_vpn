@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#050a05">
-<title>ZAGA VPN — Free Proxy Service</title>
+<title>ZAGA FREE VPN — Free Proxy Service</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700;800&display=swap');
 
@@ -19,13 +20,9 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{
-  font-family:'JetBrains Mono',monospace;
-  background:#050a05;color:var(--text);
-  min-height:100vh;overflow-x:hidden;
-}
+body{font-family:'JetBrains Mono',monospace;background:#050a05;color:var(--text);min-height:100vh;overflow-x:hidden}
 
-/* ===== фон: матрица + сканлайны + сетка ===== */
+/* ===== фон ===== */
 #matrix-bg{position:fixed;inset:0;z-index:0;opacity:.12}
 body::before{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;
   background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,65,.012) 2px,rgba(0,255,65,.012) 4px)}
@@ -35,10 +32,9 @@ body::after{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;
 .particle{position:fixed;width:2px;height:2px;background:var(--neon);border-radius:50%;pointer-events:none;z-index:2;opacity:0;animation:float-up 8s linear infinite}
 @keyframes float-up{0%{opacity:0;transform:translateY(100vh) scale(0)}10%{opacity:.5}90%{opacity:.15}100%{opacity:0;transform:translateY(-10vh) scale(1)}}
 
-/* ===== каркас ===== */
 .wrap{position:relative;z-index:10;width:min(100% - 36px,960px);margin:auto;display:flex;flex-direction:column;min-height:100vh}
 
-/* ===== терминальная шапка ===== */
+/* ===== шапка ===== */
 .top{display:flex;justify-content:space-between;align-items:center;padding:22px 0}
 .dots{display:flex;gap:6px}
 .dot{width:9px;height:9px;border-radius:50%}
@@ -47,23 +43,24 @@ body::after{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;
 .status-dot{width:7px;height:7px;border-radius:50%;background:var(--neon);box-shadow:0 0 7px var(--neon);animation:pulse 1.5s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4;transform:scale(.7)}}
 
-/* ===== hero ===== */
-.hero{text-align:center;padding:48px 0 52px}
-.ascii{
-  width:max-content;margin:0 auto 26px;
-  font-size:clamp(5px,2.2vw,16px);line-height:1.12;
-  color:var(--neon);
-  text-shadow:0 0 6px var(--neon-glow),0 0 22px var(--neon-glow);
-  user-select:none;cursor:pointer;
-}
+/* ===== hero / лого ===== */
+.hero{text-align:center;padding:44px 0 50px}
+.logo-row{display:flex;align-items:center;justify-content:center;gap:clamp(6px,2vw,18px);margin-bottom:28px}
+.fire{font-size:clamp(14px,3vw,30px);filter:drop-shadow(0 0 9px rgba(255,140,0,.65));animation:flicker 1.5s ease-in-out infinite;user-select:none}
+.fire:last-child{animation-delay:.75s}
+@keyframes flicker{0%,100%{transform:scale(1) rotate(0)}30%{transform:scale(1.14) rotate(-5deg);opacity:.9}60%{transform:scale(.95) rotate(4deg);opacity:1}}
+.ascii{width:max-content;margin:0 auto;line-height:1.12;color:var(--neon);
+  text-shadow:0 0 6px var(--neon-glow),0 0 22px var(--neon-glow);user-select:none}
+.ascii-big{font-size:clamp(10px,3.7vw,38px)}
+.ascii-small{font-size:clamp(6px,2vw,20px);margin-top:8px}
 .hero .sub{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:rgba(0,255,65,.45);margin-bottom:12px}
 .hero .hint{font-size:11px;color:rgba(0,255,65,.3)}
 .cursor-blink::after{content:"█";color:var(--neon);animation:blink 1s step-end infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 .actions{display:flex;justify-content:center;gap:11px;flex-wrap:wrap;margin-top:30px}
 .btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 20px;border-radius:11px;
-  border:1px solid rgba(0,255,65,.6);background:var(--neon);color:#06120a;
-  font-family:inherit;font-weight:700;font-size:12px;letter-spacing:.04em;text-decoration:none;cursor:pointer;transition:.2s}
+  border:1px solid rgba(0,255,65,.6);background:var(--neon);color:#06120a;font-family:inherit;font-weight:700;font-size:12px;
+  letter-spacing:.04em;text-decoration:none;cursor:pointer;transition:.2s}
 .btn:hover{transform:translateY(-2px);box-shadow:0 0 22px var(--neon-glow)}
 .btn.ghost{background:rgba(0,255,65,.06);color:var(--text);border-color:var(--line)}
 .btn.ghost:hover{border-color:rgba(0,255,65,.45);box-shadow:0 0 16px rgba(0,255,65,.12)}
@@ -77,23 +74,31 @@ section{margin:14px 0 54px}
 
 /* карточки */
 .cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-.card{position:relative;overflow:hidden;padding:24px;border:1px solid var(--line);border-radius:18px;
-  background:var(--panel);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:.25s}
+.card{position:relative;overflow:hidden;padding:24px;border:1px solid var(--line);border-radius:18px;background:var(--panel);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:.25s}
 .card:hover{transform:translateY(-3px);border-color:rgba(0,255,65,.4);box-shadow:0 0 30px rgba(0,255,65,.07)}
 .card::after{content:"";position:absolute;right:-60px;top:-80px;width:170px;height:170px;border-radius:50%;background:rgba(0,255,65,.07);filter:blur(26px);pointer-events:none}
 .cardtop{display:flex;justify-content:space-between;align-items:center}
 .ico{display:grid;place-items:center;width:46px;height:46px;border:1px solid var(--line);border-radius:13px;background:rgba(0,255,65,.05);font-size:21px}
 .tag{padding:5px 9px;border:1px solid rgba(0,255,65,.3);border-radius:7px;color:var(--neon);background:rgba(0,255,65,.08);font-size:9px;font-weight:800;letter-spacing:.14em}
+.tag.flags{display:inline-flex;align-items:center;gap:7px;padding:6px 10px}
+.flag{display:inline-block;width:21px;height:14px;border-radius:3px;box-shadow:0 0 0 1px rgba(255,255,255,.18)}
+.flag.ru{background:linear-gradient(180deg,#f5f5f5 33.3%,#0039a6 33.3% 66.6%,#d52b1e 66.6%)}
+.flag.us{background-image:linear-gradient(#3c3b6e,#3c3b6e),repeating-linear-gradient(180deg,#b22234 0 2px,#f5f5f5 2px 4px);
+  background-size:42% 54%,100% 100%;background-position:0 0,0 0;background-repeat:no-repeat,repeat}
 .card h3{margin:17px 0 6px;font-size:18px;color:#fff}
 .card p{color:var(--muted);font-size:12px;line-height:1.6}
 .cardfoot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:22px}
 .meta{color:#7d9684;font-size:10px}
+.cf-actions{display:flex;gap:8px}
 .copy{min-height:40px;padding:0 15px;border:1px solid rgba(0,255,65,.55);border-radius:10px;background:rgba(0,255,65,.07);
   color:var(--neon);font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.2s}
 .copy:hover,.copy.done{background:var(--neon);color:#06120a;box-shadow:0 0 16px var(--neon-glow)}
+.copy.qrbtn{background:rgba(0,255,65,.03);border-color:rgba(0,255,65,.35)}
 
 /* warning */
-.warning{display:grid;grid-template-columns:auto 1fr;gap:15px;padding:21px 22px;border:1px solid rgba(255,70,70,.22);border-radius:16px;background:rgba(40,8,8,.6);backdrop-filter:blur(14px)}
+.warning{display:grid;grid-template-columns:auto 1fr;gap:15px;padding:21px 22px;border:1px solid rgba(255,70,70,.22);border-radius:16px;
+  background:rgba(40,8,8,.6);backdrop-filter:blur(14px)}
 .warning .symbol{font-size:21px}
 .warning h3{color:#ffb0b0;font-size:13px;margin-bottom:6px}
 .warning p{color:#c9a1a1;font-size:11px;line-height:1.7}
@@ -103,7 +108,8 @@ section{margin:14px 0 54px}
 /* шаги */
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
 .step{padding:19px;border:1px solid var(--line);border-radius:15px;background:rgba(10,20,12,.7);backdrop-filter:blur(10px)}
-.num{display:grid;place-items:center;width:30px;height:30px;border:1px solid rgba(0,255,65,.5);border-radius:9px;color:var(--neon);background:rgba(0,255,65,.06);font-weight:800;font-size:11px}
+.num{display:grid;place-items:center;width:30px;height:30px;border:1px solid rgba(0,255,65,.5);border-radius:9px;color:var(--neon);
+  background:rgba(0,255,65,.06);font-weight:800;font-size:11px}
 .step h3{margin:14px 0 5px;font-size:13px;color:#eafff0}
 .step p{color:var(--muted);font-size:11px;line-height:1.6}
 
@@ -113,13 +119,31 @@ section{margin:14px 0 54px}
 .stat strong{display:block;color:var(--neon);font-size:18px;text-shadow:0 0 12px var(--neon-glow)}
 .stat span{display:block;margin-top:5px;color:var(--muted);font-size:9px;letter-spacing:.14em;text-transform:uppercase}
 
-/* футер */
-.foot{display:flex;justify-content:space-between;gap:12px;margin-top:auto;padding:22px 0 30px;border-top:1px solid rgba(0,255,65,.1);color:#789080;font-size:10px}
-.foot a{color:#a8c6b1;text-decoration:none}
-.foot a:hover{color:var(--neon)}
+/* ===== футер: по центру, без ссылки ===== */
+.foot{margin-top:auto;padding:24px 0 32px;border-top:1px solid rgba(0,255,65,.1);text-align:center;color:#789080;font-size:10px;line-height:1.8}
+.foot .copy-line{color:#9dbba6;letter-spacing:.06em}
+
+/* ===== QR-модалка ===== */
+.modal{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:20px;background:rgba(2,6,3,.8);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:.22s}
+.modal.open{opacity:1;pointer-events:auto}
+.modal-box{width:min(92vw,340px);padding:22px;border:1px solid rgba(0,255,65,.4);border-radius:18px;background:#0a140c;
+  box-shadow:0 0 44px rgba(0,255,65,.16);text-align:center;transform:scale(.94);transition:.22s}
+.modal.open .modal-box{transform:scale(1)}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.modal-head span{color:var(--neon);font-size:10px;font-weight:800;letter-spacing:.2em;text-transform:uppercase}
+.modal-close{width:30px;height:30px;border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--muted);
+  font-family:inherit;font-size:13px;cursor:pointer;transition:.2s}
+.modal-close:hover{color:var(--neon);border-color:rgba(0,255,65,.5)}
+.qr-wrap{display:grid;place-items:center;width:fit-content;margin:16px auto 14px;padding:14px;background:#050a05;
+  border:1px solid var(--line);border-radius:14px;box-shadow:inset 0 0 24px rgba(0,255,65,.05)}
+.qr-wrap :is(canvas,img,table){display:block;width:200px;height:200px;image-rendering:pixelated}
+.qr-wrap table{border-collapse:collapse}
+.qr-url{font-size:9px;color:var(--muted);word-break:break-all;line-height:1.5}
+.qr-hint{margin-top:10px;font-size:10px;color:rgba(0,255,65,.4)}
 
 /* toast */
-.toast{position:fixed;left:50%;bottom:24px;z-index:20;transform:translate(-50%,16px);padding:11px 18px;
+.toast{position:fixed;left:50%;bottom:24px;z-index:50;transform:translate(-50%,16px);padding:11px 18px;
   border:1px solid rgba(0,255,65,.55);border-radius:11px;background:#0c1a10;color:#eafff0;font-size:12px;
   box-shadow:0 0 24px rgba(0,255,65,.15);opacity:0;pointer-events:none;transition:.22s}
 .toast.show{opacity:1;transform:translate(-50%,0)}
@@ -127,13 +151,13 @@ section{margin:14px 0 54px}
 /* ===== адаптив ===== */
 @media(max-width:680px){
   .wrap{width:calc(100% - 28px)}
-  .hero{padding:34px 0 40px}
+  .hero{padding:32px 0 40px}
   .cards,.steps{grid-template-columns:1fr}
   .heading{flex-direction:column;align-items:flex-start;gap:4px}
-  .foot{flex-direction:column}
 }
-@media(max-width:390px){
+@media(max-width:420px){
   .cardfoot{flex-direction:column;align-items:stretch}
+  .cf-actions{flex-direction:column}
   .copy{width:100%}
   .stats{gap:6px}
   .stat{padding:12px 5px}
@@ -159,15 +183,28 @@ section{margin:14px 0 54px}
 
   <main>
 
-    <!-- HERO: только ASCII-лого -->
+    <!-- HERO: лого ZAGA FREE VPN + огоньки -->
     <div class="hero">
-<pre class="ascii" id="logo" aria-hidden="true">
-███████╗  █████╗   ██████╗   █████╗    ██╗   ██╗ ██████╗  ███╗   ██╗
-╚══███╔╝ ██╔══██╗ ██╔════╝  ██╔══██╗   ██║   ██║ ██╔══██╗ ████╗  ██║
-  ███╔╝  ███████║ ██║  ███╗ ███████║   ██║   ██║ ██████╔╝ ██╔██╗ ██║
- ███╔╝   ██╔══██║ ██║   ██║ ██╔══██║   ╚██╗ ██╔╝ ██╔═══╝  ██║╚██╗██║
-███████╗ ██║  ██║ ╚██████╔╝ ██║  ██║    ╚████╔╝  ██║      ██║ ╚████║
-╚══════╝ ╚═╝  ╚═╝  ╚═════╝  ╚═╝  ╚═╝     ╚═══╝   ╚═╝      ╚═╝  ╚═══╝</pre>
+      <div class="logo-row">
+        <span class="fire" aria-hidden="true">🔥</span>
+        <div id="logo" style="cursor:pointer">
+<pre class="ascii ascii-big" aria-hidden="true">
+███████╗  █████╗   ██████╗   █████╗
+╚══███╔╝ ██╔══██╗ ██╔════╝  ██╔══██╗
+  ███╔╝  ███████║ ██║  ███╗ ███████║
+ ███╔╝   ██╔══██║ ██║   ██║ ██╔══██║
+███████╗ ██║  ██║ ╚██████╔╝ ██║  ██║
+╚══════╝ ╚═╝  ╚═╝  ╚═════╝  ╚═╝  ╚═╝</pre>
+<pre class="ascii ascii-small" aria-hidden="true">
+██████╗  ██████╗  ███████╗ ███████╗   ██╗   ██╗ ██████╗  ███╗   ██╗
+██╔════╝ ██╔══██╗ ██╔════╝ ██╔════╝   ██║   ██║ ██╔══██╗ ████╗  ██║
+█████╗   ██████╔╝ █████╗   █████╗     ██║   ██║ ██████╔╝ ████╗ ██║
+██╔══╝   ██╔══██╗ ██╔══╝   ██╔══╝     ╚██╗ ██╔╝ ██╔═══╝  ██║╚██╗██║
+██║      ██║  ██║ ███████╗ ███████╗    ╚████╔╝  ██║      ██║ ╚████║
+╚═╝      ╚═╝  ╚═╝ ╚══════╝ ╚══════╝    ╚═══╝   ╚═╝      ╚═╝  ╚═══╝</pre>
+        </div>
+        <span class="fire" aria-hidden="true">🔥</span>
+      </div>
       <p class="sub">Free Proxy Service</p>
       <p class="hint cursor-blink">Подключение через Hiddify</p>
       <div class="actions">
@@ -189,16 +226,24 @@ section{margin:14px 0 54px}
           <p>Подборка WARP-конфигураций. Импортируйте ссылку в Hiddify как профиль подписки.</p>
           <div class="cardfoot">
             <span class="meta">Обновление профиля: 24 ч</span>
-            <button class="copy" data-copy="https://raw.githubusercontent.com/Zagidin/zaga_sub_warp/main/warp">⧉ Скопировать ссылку</button>
+            <div class="cf-actions">
+              <button class="copy qrbtn" data-qr="https://raw.githubusercontent.com/Zagidin/zaga_sub_warp/main/warp">▣ QR</button>
+              <button class="copy" data-copy="https://raw.githubusercontent.com/Zagidin/zaga_sub_warp/main/warp">⧉ Скопировать</button>
+            </div>
           </div>
         </article>
         <article class="card">
-          <div class="cardtop"><div class="ico">🌐</div><span class="tag">RU / USA</span></div>
+          <div class="cardtop"><div class="ico">🌐</div>
+            <span class="tag flags"><i class="flag ru" title="Россия"></i><i class="flag us" title="США"></i></span>
+          </div>
           <h3>VPN Proxy</h3>
           <p>Список прокси-конфигураций разных регионов. Состав подписки может меняться.</p>
           <div class="cardfoot">
             <span class="meta">Обновление профиля: 1 ч</span>
-            <button class="copy" data-copy="https://raw.githubusercontent.com/Zagidin/zaga_sub_warp/main/zaga_vpn_ru_usa.txt">⧉ Скопировать ссылку</button>
+            <div class="cf-actions">
+              <button class="copy qrbtn" data-qr="https://raw.githubusercontent.com/Zagidin/zaga_sub_warp/main/zaga_vpn_ru_usa.txt">▣ QR</button>
+              <button class="copy" data-copy="https://raw.githubusercontent.com/Zagidin/zaga_sub_warp/main/zaga_vpn_ru_usa.txt">⧉ Скопировать</button>
+            </div>
           </div>
         </article>
       </div>
@@ -230,8 +275,8 @@ section{margin:14px 0 54px}
       </div>
       <div class="steps">
         <article class="step"><div class="num">01</div><h3>Установите Hiddify</h3><p>Скачайте приложение для Android, iOS, Windows или macOS с официального сайта.</p></article>
-        <article class="step"><div class="num">02</div><h3>Скопируйте подписку</h3><p>Нажмите «Скопировать ссылку» у нужной конфигурации выше.</p></article>
-        <article class="step"><div class="num">03</div><h3>Добавьте профиль</h3><p>В Hiddify нажмите «+» → «Добавить профиль» и вставьте ссылку.</p></article>
+        <article class="step"><div class="num">02</div><h3>Скопируйте подписку</h3><p>Нажмите «Скопировать» или покажите QR-код у нужной конфигурации выше.</p></article>
+        <article class="step"><div class="num">03</div><h3>Добавьте профиль</h3><p>В Hiddify нажмите «+» → «Добавить профиль» и вставьте ссылку или отсканируйте QR.</p></article>
       </div>
     </section>
 
@@ -249,11 +294,22 @@ section{margin:14px 0 54px}
 
   </main>
 
+  <!-- футер: по центру, без ссылки -->
   <footer class="foot">
-    <span>© 2026 ZAGA VPN · Публичный сервис</span>
-    <a href="https://github.com/Zagidin/zaga_sub_warp" target="_blank" rel="noopener noreferrer">GitHub репозиторий ↗</a>
+    <div class="copy-line">© 2026 ZAGA FREE VPN · Публичный сервис</div>
+    <div>Бесплатные подписки WARP и VPN Proxy для Hiddify. Конфигурации собираются из публичных источников и обновляются автоматически.</div>
   </footer>
 
+</div>
+
+<!-- QR-модалка -->
+<div class="modal" id="qrModal" aria-hidden="true" role="dialog" aria-label="QR-код подписки">
+  <div class="modal-box">
+    <div class="modal-head"><span>QR-код подписки</span><button class="modal-close" id="qrClose" aria-label="Закрыть">✕</button></div>
+    <div class="qr-wrap" id="qrBox"></div>
+    <p class="qr-url" id="qrUrl"></p>
+    <p class="qr-hint">Наведите камеру телефона, чтобы передать подписку</p>
+  </div>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite">Ссылка скопирована</div>
@@ -286,7 +342,6 @@ if (!reduce) {
   }, 50);
   addEventListener('resize', () => { cols = Math.floor(canvas.width / fs); drops = Array(cols).fill(1); });
 
-  /* частицы */
   const pc = document.getElementById('particles');
   for (let i = 0; i < 10; i++) {
     const p = document.createElement('div');
@@ -298,7 +353,7 @@ if (!reduce) {
   }
 }
 
-/* ===== копирование + toast ===== */
+/* ===== toast + копирование ===== */
 const toast = document.getElementById('toast');
 let timer;
 function notify(text) {
@@ -323,10 +378,36 @@ document.querySelectorAll('[data-copy]').forEach(btn => btn.addEventListener('cl
     btn.classList.add('done');
     notify('Ссылка скопирована в буфер обмена');
     setTimeout(() => { btn.textContent = old; btn.classList.remove('done'); }, 1800);
-  } catch (e) {
-    notify('Не удалось скопировать. Откройте ссылку вручную.');
-  }
+  } catch (e) { notify('Не удалось скопировать. Откройте ссылку вручную.'); }
 }));
+
+/* ===== QR-модалка ===== */
+const modal = document.getElementById('qrModal');
+const qrBox = document.getElementById('qrBox');
+const qrUrl = document.getElementById('qrUrl');
+
+function openQr(url) {
+  qrBox.innerHTML = '';
+  qrUrl.textContent = url;
+  if (window.QRCode) {
+    new QRCode(qrBox, { text: url, width: 200, height: 200, colorDark: '#00ff41', colorLight: '#050a05', correctLevel: QRCode.CorrectLevel.M });
+  } else {
+    const img = new Image();
+    img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=00ff41&bgcolor=050a05&data=' + encodeURIComponent(url);
+    img.alt = 'QR-код подписки';
+    qrBox.appendChild(img);
+  }
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+}
+function closeQr() {
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+}
+document.querySelectorAll('[data-qr]').forEach(btn => btn.addEventListener('click', () => openQr(btn.dataset.qr)));
+document.getElementById('qrClose').addEventListener('click', closeQr);
+modal.addEventListener('click', e => { if (e.target === modal) closeQr(); });
+addEventListener('keydown', e => { if (e.key === 'Escape') closeQr(); });
 
 /* ===== пасхалка: 5 кликов по лого ===== */
 let clicks = 0;
