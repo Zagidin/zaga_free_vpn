@@ -118,13 +118,14 @@ section{margin:14px 0 54px}
 .copy.qrbtn{background:rgba(0,255,65,.03);border-color:rgba(0,255,65,.35)}
 
 /* warning */
-.warning{display:grid;grid-template-columns:auto 1fr;gap:15px;padding:21px 22px;border:1px solid rgba(255,70,70,.22);border-radius:16px;
-  background:rgba(40,8,8,.6);backdrop-filter:blur(14px)}
-.warning .symbol{font-size:21px}
-.warning h3{color:#ffb0b0;font-size:13px;margin-bottom:6px}
-.warning p{color:#c9a1a1;font-size:11px;line-height:1.7}
-.warning ul{display:flex;flex-wrap:wrap;gap:7px 22px;margin-top:12px;list-style:none;color:#d2b0b0;font-size:11px}
-.warning li::before{content:"×";color:#ff7777;margin-right:7px}
+.warning{display:grid;grid-template-columns:auto 1fr;gap:16px;padding:22px 24px;border:1px solid rgba(255,70,70,.22);border-radius:16px;
+  background:rgba(40,8,8,.6);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.warning .symbol{font-size:22px}
+.warning h3{color:#ffb0b0;font-size:clamp(14px,2.2vw,16px);margin-bottom:8px}
+.warning p{color:#c9a1a1;font-size:clamp(12px,2vw,13.5px);line-height:1.75}
+.warning p b{color:#ffd2d2;font-weight:800;text-shadow:0 0 10px rgba(255,80,80,.25)}
+.warning ul{display:flex;flex-wrap:wrap;gap:9px 22px;margin-top:14px;list-style:none;color:#d2b0b0;font-size:clamp(11.5px,1.9vw,12.5px)}
+.warning li::before{content:"×";color:#ff7777;margin-right:7px;font-weight:800}
 
 /* шаги */
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
@@ -335,15 +336,15 @@ section{margin:14px 0 54px}
       </div>
       <div class="warning">
         <div class="symbol">⚠️</div>
-        <div>
-          <h3>Публичные прокси — это риск</h3>
-          <p>Информация в списках получена из открытых источников. Администрация сайта не контролирует сторонние ресурсы, не проверяет их содержимое и не несет ответственности за их доступность, безопасность, конфиденциальность или за любой ущерб, возникший в результате их использования. Пользователи переходят по ссылкам на свой страх и риск.</p>
-          <ul>
-            <li>Не вводите пароли и платёжные данные</li>
-            <li>Не используйте для банкинга</li>
-            <li>Подключайтесь на свой страх и риск</li>
-          </ul>
-        </div>
+          <div>
+            <h3>Публичные прокси — это риск</h3>
+            <p>Информация в списках получена из открытых источников. <b>Администрация сайта не контролирует сторонние ресурсы, не проверяет их содержимое и не несёт ответственности за их доступность, безопасность, конфиденциальность или за любой ущерб, возникший в результате их использования.</b> Пользователи переходят по ссылкам на свой страх и риск.</p>
+            <ul>
+              <li>Не вводите пароли и платёжные данные</li>
+              <li>Не используйте для банкинга</li>
+              <li>Подключайтесь на свой страх и риск</li>
+            </ul>
+          </div>
       </div>
     </section>
 
